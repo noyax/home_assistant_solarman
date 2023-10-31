@@ -1,164 +1,222 @@
-# Solarman integration
+<br><br><br>
 
-Home Assistant component for interacting with Solarman data collectors used with a variety of inverters. The integration allows Home Assistant to connect in direct-mode over the local network to the collector to extract the information, and no cables are required.
+Présentation
+===
+Le plugin Solarman permet de récupérer les informations de votre onduleur monitoré par le site https://home.solarmanpv.com/ , comme par exemple les Sofar Solar HYD de 3 à 6K ES. 
 
-It has been created with a 5kW DEYE/SUNSYNK inverter and since integrated with a variety of other inverters that uses the Solarman data collector.
+Fichiers de configuration auto pour: Afore_BNTxxxKTL-2mppt, deye_2mppt, deye_4mppt, deye_hybrid, deye_sg04lp3, deye_string, hyd-zss-hp-3k-6k, kstar_hybrid, sofar_g3hyd, sofar_hyd3k-6k-es, sofar_lsw3, sofar_wifikit, sofar_XXTL-G3.yaml, solis_1p8k-5g, solis_3p-4g, solis_hybrid, solis_s6-gr1p, zcs_azzurro-ktl-v3.
+<br>
 
-This component uses Pysolarman by Jonathan McCrohan for the underlying protocol, and also provides service-access to the library for advanced users. See [advanced](advanced.md) 
+Liste (non exhaustives) des onduleurs pris en compte à l'heure actuelle et le fichier de configuration associé:  
+<br>
 
-# Discord
+| Fichier de configuration   | Onduleurs supportés                      | Observations                                                     |
+|----------------------------|------------------------------------------|------------------------------------------------------------------|
+| Afore_BNTxxxKTL-2mppt.yaml | ?                                        |                                                                  |
+| deye_2mppt.yaml            | DEYE Microinverter with 2 MPPT Trackers  | e.g. SUN600G3-EU-230 / SUN800G3-EU-230 / SUN1000G3-EU-230        |
+| deye_4mppt.yaml            | DEYE Microinverter with 4 MPPT Trackers  | e.g. SUN1300G3-EU-230 / SUN1600G3-EU-230 / SUN2000G3-EU-230      |
+| deye_hybrid.yaml           | DEYE/Sunsynk/SolArk Hybrid inverters     | used when no lookup specified                                    |
+| deye_sg04lp3.yaml          | DEYE/Sunsynk/SolArk Hybrid 8/12K-SG04LP3 | e.g. 12K-SG04LP3-EU                                              |
+| deye_string.yaml           | DEYE/Sunsynk/SolArk String inverters     | e.g. SUN-4/5/6/7/8/10/12K-G03 Plus                               |
+| hyd-zss-hp-3k-6k.yaml      | ?                                        |                                                                  |
+| kstar_hybrid.yaml          | ?                                        |                                                                  |
+| sofar_g3hyd.yaml           | SOFAR Hybrid Three-Phase inverter        | HYD 6000 or rebranded (three-phase), ex. ZCS Azzurro 3PH HYD-ZSS |
+| sofar_hyd3k-6k.yaml        | SOFAR Hybrid Single-Phase inverter       | HYD 6000 or rebranded (single-phase), ex. ZCS Azzurro HYD-ZSS    |
+| sofar_lsw3.yaml            | SOFAR Inverters                          |                                                                  |
+| sofar_wifikit.yaml         | ?                                        |                                                                  |
+| sofar_XXTL-G3.yaml         | SOFAR xxxx TL G3                         | Testé sur Sofar Solar 3000 TL G3                                 |
+| solid_1p8k-5g.yaml         | SOLIS 1P8K-5G                            |                                                                  |
+| solid_3p-4g.yaml           | SOLIS 3P-4G                              |                                                                  |
+| solis_hybrid.yaml          | SOLIS Hybrid inverter                    |                                                                  |
+| solid_s6-grip.yaml         | SOLIS S6-GRIP                            |                                                                  |
+| zcs_azzurro-ktl-v3.yaml    | ZCS Azzurro KTL-V3 inverters             | ZCS Azzurro 3.3/4.4/5.5/6.6 KTL-V3 (rebranded Sofar KTLX-G3)     |
 
-Feel free to discuss the integration by joining the [Discord server.](https://discord.gg/3HQJXR7qRd)
 
-# Installation
+<br><br><br><br><br>
 
-## HACS
 
-This method is prefered.
+Pré-requis:
+===
+Pour pouvoir récupérer les infos de votre onduleur il faut un onduleur compatible (liste ci dessus) équipé d'une clé wifi. Cela ressemble à ça:
 
-## Manual
+![Clé Wifi](cle_wifi.png)
 
-For this, it is highly recomended to use the "Samba share" add-on (you will need to enable advanced mode in your user profile).
+<br>
+<br>
 
-Clone or download the repo, and copy the "solarman" folder in "custom_components" to the "custom_components" folder in home assistant.
+Installation du plugin
+===
+Besoin d'explications? Ok, alors une fois le plugin installé faites une mise à jour des dépendances
 
-After that, the folder structure should look as follows:
+<br>
+<br>
 
-```bash
-custom_components
-├── solarman
-│   ├── __init__.py
-│   ├── const.py
-│   ├── manifest.json
-│   ├── parser.py
-│   ├── solarman.py
-│   ├── sensor.py
-│   └── inverter_definitions
-│       ├── {inverter-definition yaml files}
-├── {other components}
-```
+Configuration générale du plugin
+===
+![Config générale](recherche.png)
 
-# Preparation
+<br>
+<br>
+Un bouton permet de chercher sur le réseau les onduleurs qui s'y trouvent:
+<br>
 
-1. Get the IP and Serial Number to use in the configuration.
+Pour rechercher: cliquer sur 1, si le bouton de log 3 n'apparait pas alors cliquer sur 4 et enfin cliquer sur le bouton 3.
 
-Find the internal IP of the logger on the DHCP server, and then open a browser and navigate to that address. If you are prompted for a username/password, use "admin" as username and "admin" as password.
+Voici le genre de log que vous verrez apparaitre:
 
-Once logged in, expand the "Device information" and note the Device serial number, as well as the IP used.
+![Log recherche réseau](log_recherche.png)
 
-![WebPortal](./web_portal.png)
+Vous n'aurez plus qu'à copier l'adresse IP et le serial dans la configuration de votre onduleur.
 
-2. Check the version of the solarman logger. If the serial number starts with 17xxxxxxx, 21xxxxxxx or 40xxxxxxx (protocol V5), the component should work. If not, you may need to try the component for V4 of the protocol mentioned above.
+Rien de particulier en plus. Un champ non accessible pour une éventuelle évolution mais pas certain qu'elle voit le jour.
 
-3. On your DHCP server, reserve the IP for the WiFi data logger so that it will not change.
+<br>
+<br>
+<br>
+<br>
+<br>
 
-# Configuration
+Création d'un nouvel équipement
+===
+![Nouvel équipement](ajout_ondul.png)
 
-This integration can be configured using config-flow, or by manually configuring using the configuraiton.yaml file. Both methods are described below:
+Cliquer sur le + "Ajouter"
 
-## Automatic (config flow)
+## Choix
+<br>
 
-1. After the installation of this component, click on the "Configuration" tab on the left, then on "Devices & Services"
-2. Select the "Integrations" tab on the top of the screen, then on the "+ ADD INTEGRATION" button on the left-hand corner.
-3. Select the solarman integration
-   ![Solarman](./flow_select.png)
+![Choix équipement](ajout_ondul1.png)
 
-4.Configure the entity by filling in the details.
-![Solarman](./flow_init_manual.png)
+Donnez un nom à votre nouvel équipement puis choisissez le fichier modèle qui servira à le paramétrer
 
-## Manual Configuration (configuration.yaml)
+<br>
 
-In your configuration.yaml file, add the solarman platform under "sensor"
+## Paramétrage de l'équipement:
+<br>
 
-### Example:
+![paramétrage équipement](param_equipmnt.png)
+<br>
+Les premiers champs sont classiques.
 
-```YAML
+Ensuite le fichier de configuration que vous avez sélectionné ne sera plus modifiable. Si vous vous êtes trompé alors supprimer cet équipement et recréez en un autre.
 
-sensor:
-  - platform: solarman
-    name: DEYE
-    inverter_host: 192.168.0.100
-    inverter_port: 8899
-    inverter_serial: 1720747149
-    inverter_mb_slaveid: 1
-    lookup_file: deye_hybrid.yaml
-```
+Il faut que vous saisissiez l'adresse ip de votre clé wifi, le port qu'elle utilise pour communiquer et son numéro de série. Le port est en général 8899 mais il faudra que vous alliez chercher le numéro de série dans les configuration de votre clé.
 
-## Parameters
+la page de configuration se visualise avec votre navigateur internet en saisissant l'adresse de votre clé: http://adresse_ip_de_votre_clé_wifi l'utilisateur et le mot de passe par défaut si vous ne les avez pas changés sont admin et admin
 
-| Parameter           | Description                                                             |
-| ------------------- | ----------------------------------------------------------------------- |
-| name                | This name will be prefixed to all parameter values (change as you like) |
-| inverter_host       | The IP address of the data logger. (\* see: autodiscover)               |
-| inverter_port       | Always 8899                                                             |
-| inverter_serial     | The serial number of the data collector (\* see: autodiscover)          |
-| inverter_mb_slaveid | The Modbus Slave ID of the inverter. Defaults to 1                      |
-| scan_interval       | Time in seconds between refresh intervals                               |
-| lookup_file         | \*\* The yaml file to use for parameter-definition                      |
+![paramétrage clé wifi](param_cle.png)
 
-\*\* This parameter is optional, and if not specified will revert to deye_hybrid.yaml. If you customize the parameters, create a lookup file "custom_parameters.yaml" and refer to it so that it will not be overwritten during updates.
+Ensuite choississez la fréquence d'interrogation que vous souhaitez, seuls 1, 5, 10, 15 et 30 minutes sont valides.
 
-### Lookup Files
 
-| Lookup File             | Inverters supported                      | Notes                                                        |
-|-------------------------|------------------------------------------|--------------------------------------------------------------|
-| deye_hybrid.yaml        | DEYE/Sunsynk/SolArk Hybrid inverters     | used when no lookup specified                                |
-| deye_sg04lp3.yaml       | DEYE/Sunsynk/SolArk Hybrid 8/12K-SG04LP3 | e.g. 12K-SG04LP3-EU                                          |
-| deye_string.yaml        | DEYE/Sunsynk/SolArk String inverters     | e.g. SUN-4/5/6/7/8/10/12K-G03 Plus                           |
-| deye_2mppt.yaml         | DEYE Microinverter with 2 MPPT Trackers  | e.g. SUN600G3-EU-230 / SUN800G3-EU-230 / SUN1000G3-EU-230    |
-| deye_4mppt.yaml         | DEYE Microinverter with 4 MPPT Trackers  | e.g. SUN1300G3-EU-230 / SUN1600G3-EU-230 / SUN2000G3-EU-230  |
-| sofar_lsw3.yaml         | SOFAR Inverters                          |
-| sofar_g3hyd.yaml        | SOFAR Hybrid Three-Phase inverter        | HYD 6000 or rebranded (three-phase), ex. ZCS Azzurro 3PH HYD-ZSS |
-| sofar_hyd3k-6k.yaml     | SOFAR Hybrid Single-Phase inverter       | HYD 6000 or rebranded (single-phase), ex. ZCS Azzurro HYD-ZSS|
-| solis_hybrid.yaml       | SOLIS Hybrid inverter                    |
-| solid_1p8k-5g.yaml      | SOLIS 1P8K-5G                            |
-| zcs_azzurro-ktl-v3.yaml | ZCS Azzurro KTL-V3 inverters             | ZCS Azzurro 3.3/4.4/5.5/6.6 KTL-V3 (rebranded Sofar KTLX-G3) |
+Si votre onduleur n'est pas dans la liste
+===
 
-# Auto-discovery
+Si vous pensez que votre onduleur peut faire partie de ceux pouvant être monitorés par Solarman et que vous connaissez les registres modbus à interroger alors en utilisant le ![fichier modèle](modele_onduleur.yaml) vous pouvez en recréér un en respectant bien les principes suivants:
 
-The component has the option to auto-discover the logger IP and serial number.
+## pour la partie "requests":
 
-To use auto discovery, the IP should be specified as 0.0.0.0 and/or the serial as 0
+exemple:
 
-NOTE:
-This should be used as a temporary or debug measure since the discovery only happens when the component starts and, if the logger is inaccessible at that point, the entities will unavailable until restart. This will not be the case when the IP and serial was specified.
+requests:
+  - start: 0x0200
+    end:  0x0255
+    mb_functioncode: 0x03
+  - start: 0x10B0
+    end: 0x10BC
+    mb_functioncode: 0x04
 
-## Manual
+Il faut donc que vous connaissiez les codes fonction modbus utilisés pour interroger les registres de votre onduleur. Pour chaque "mb_functioncode" vous devez indiquer l'intervalle entre le premier registre à interroger, "start", et le dernier, "end".
 
-The section below shows an example configuration done using manual configuration. This is an option for those that want to customize the component for inverters not supported out of the box.
+## pour la partie "parameters":
 
-```YAML
+exemple:
 
-sensor:
-  - platform: solarman
-    name: DEYE
-    inverter_host: 0.0.0.0
-    inverter_port: 8899
-    inverter_serial: 0
-    inverter_mb_slaveid: 1
-    lookup_file: deye_hybrid.yaml
-```
+parameters:
+ - group: blablabla  
+   items: blablablabla  
+    - name: "Le nom du registre"  
+      uom: "Wh"  
+      scale: 0.01  
+      rule: 1  
+      registers: [0x0200]  
+  
+    - name: "Total Production"  
+      uom: "kWh"  
+      scale: 1  
+      rule: 3  
+      registers: [0x0255,0x0254]  
+  
+    - name: "Grid Current"  
+      uom: "A"  
+      scale: 0.01  
+      rule: 2  
+      registers: [0x10B0]  
+  
+    - name: "Inverter status"  
+      uom: ""  
+      scale: 1  
+      rule: 1  
+      registers: [0x10BC]  
+      isstr: true  
+      lookup:  
+      -  key: 0  
+         value: "Stand-by"  
+      -  key: 1  
+         value: "Self-Checking"  
+      -  key: 2  
+         value: "Normal"  
+      -  key: 3  
+         value: "Discharging Check State"  
+      -  key: 4  
+         value: "Discharging State"  
+      -  key: 5  
+         value: "EPS State"  
+      -  key: 6
+         value: "Fault State"  
+      -  key: 7
+         value: "Permanent State"  
+  
+### explications
 
-## Config-flow
+instructions clés:  
 
-![Autodiscover](./flow_init.png)
+   group: ne sert pas dans le plugin mais à conserver, le texte mis ensuite ne sert à rien. Il est nécessaire malgé tout de le conserver!  
+   items: idem group. Sous cette instruction vous allez regrouper les différents registres que vous allez demander au plugin d'interroger.  
+      name: nom qui sera affiché pour votre commande dans jeedom  
+      uom: ici on indique entre guillemets l'unité de mesure de ce qui est stocké dans le registre, va être utilisé dans jeedom  
+      scale: facteur multiplicateur à utiliser. Un scale de 0.1 transforme par exemple la valeur 100 en 10  
+      rule: règle que le plugin devra appliquer pour interpréter les valeurs stockées dans le registre:  
+         1: entier non signé => valeur entre 0 et 65 535 (FF FF en héxadécimal)  
+         2: entier signé => valeur entre -32 768 et +32 768  
+         3: entier non signé stocké sur plusieurs octets (voir la partie registers)  
+         4: entier signé stocké sur plusieurs registres  
+         5: valeur en ascii  
+         6: utilisation des bits  
+         7: version (?)  
+         8: date et heure  
+         9: heure  
+      registers: le ou les registres stockant(s) les valeurs. Toujours à indiquer en héxadécimal et entre crochets (tableau). S'il y a plusieurs registres, les séparer par une virgule et à classer dans le sens du nombre le plus élevé vers le plus petit  
+      isstr: optionnel si false. Indique si true que la valeur est en caractère et sera à traduire en utilisant la clé lookup ci dessous  
+      lookup: liste de la signification du registre en fonction de sa valeur.  
+         key: valeur du registre à traduire en texte  
+         value: texte qui sera affiché à la place de la valeur du registre  
+  
+Attention à bien respecter la structure de ce fichier, les tirets sur certaines lignes et pas sur les autres, l'identation, les guillements ou non, ...  
 
-# Entities
 
-Once the component is running, it will add the following entities to Home Assistant
-![Entities](./entities.png)
+Remerciements
+===
 
-# Status Entities
+Merci à @jmccrohan pour avoir développé l'excellente librairie pySolarmanV5 [https://pysolarmanv5](https://pysolarmanv5.readthedocs.io/en/stable/#)  
 
-Apart from the inverter-parameters, it will also add status entities to view the status of the solarman component.
-![Component-status](./component_status.png)
+Merci à [@StephaneJoubert](https://github.com/StephanJoubert/home_assistant_solarman) qui a développé un module pour Home Assistant sur lequel j'ai récupéré queleques infos et fichiers python très bien écrits  
 
-# Energy Dashboard
+Merci enfin à [@Lydie13](https://community.jeedom.com/u/lydie13) qui a traduit les fichiers de configuration dans notre langue  
 
-The entities includes the device classes to enable it to be added to the [Energy Dashboard](https://www.home-assistant.io/blog/2021/08/04/home-energy-management/) introduced with Home Assistant Core 2021.8.
+Bug
+===
 
-To configure the energy dashboard with the infirmation provided by this component, see [configuring energy dashboard](energy.md)
+En cas de bug sur le plugin il est possible de demander de l'aide :
 
-# Customization
-
-This integration was tested against the DEYE 5kW inverter, and it is possible that the parameter-definitions for other inverters may differ. If you want to try your hand at it, refer to [customizing parameters.yaml](customization.md)
+[https://community.jeedom.com/tag/plugin-solarman](https://community.jeedom.com/tag/plugin-solarman)
